@@ -2,6 +2,24 @@ import streamlit as st
 import math
 import numpy as np
 import matplotlib.pyplot as plt
+import requests
+
+WEBHOOK_URL = 'https://discord.com/api/webhooks/1316290140167209011/5LiO-XQW7G15UI0F1C6cB16-aS9FkiqygqL2r5HW8uV77v9DBa75uMDpKrrar0dkSYoz'
+
+
+def fb_send(send_contents, img):
+    data = {
+        "content": send_contents
+    }
+    files = {
+        "file": ("image.png", img, "image/png")
+    }
+    response = requests.post(WEBHOOK_URL, data=data, files=files)
+
+    if response.status_code == 204 or response.status_code == 200:
+        st.success("フィードバックを送信しました！ご協力ありがとうございます。")
+    else:
+        st.error("送信に失敗しました。再度お試しください。")
 
 
 # 軌道を計算する関数
@@ -43,6 +61,7 @@ def orbit(r_x, r_y, r_h, angle):
     ax.grid()
 
     st.pyplot(fig)
+    st.write(f"### 結果")
     value1, value2, value3, value4 = st.columns(4)
     with value1:
         st.write(f"- **回転角度**: {math.degrees(yaw):.2f} 度")
@@ -60,6 +79,10 @@ def orbit(r_x, r_y, r_h, angle):
         st.write(f"- **到達時の角度**: {impact_angle:.2f} 度")
 
 
+def clear_text_area():
+    st.session_state.text_area_content = ""  # セッションステートをクリア
+
+
 # ページ作成
 st.set_page_config(
     page_title="計算ソフト",
@@ -67,17 +90,17 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-label = ['軌道計算', 'coming soon']
-choice = st.sidebar.selectbox('セレクタ', label)
+label = ['軌道計算', 'フィードバック', '更新情報', 'coming soon']
+choice = st.sidebar.selectbox('メニュー', label)
 
 match choice:
     case '軌道計算':
-        st.sidebar.title("軌道計算")
-
         MIN_VALUE = 0.00
         MAX_ANGLE = 89.00
         DEFAULT_VALUE = 0.00
         VALUE_STEP = 1.00
+
+        st.sidebar.title("軌道計算")
 
         col1, col2 = st.sidebar.columns(2)
 
@@ -121,6 +144,48 @@ match choice:
             st.markdown('# 物理的に不可能です。')
         except ZeroDivisionError:
             st.markdown('# 射出角度を変更してください。')
+
+    case 'フィードバック':
+        if "text_area_content" not in st.session_state:
+            st.session_state.text_area_content = ""
+        st.markdown('## フィードバックを送信する')
+        st.markdown('##### ※個人情報など個人を特定できる情報を含めないでください。')
+        st.text_area(
+            label="ここにテキストを入力してください",
+            value=st.session_state.text_area_content,  # セッションステートの値を使用
+            key="text_area_content",
+            height=350
+        )
+        fb_img = st.file_uploader(
+            label="スクリーンショットを追加していただくと、フィードバックを把握するうえで役立ちます。",
+            type=['jpg', 'jpeg', 'png'],
+        )
+        col1, col2 = st.columns(2)
+        with col1:
+            clear_btn = st.button('クリア', on_click=clear_text_area, use_container_width=True)
+        with col2:
+            feedback_btn = st.button('送信', type='primary', icon=":material/send:", use_container_width=True)
+
+        if feedback_btn:
+            fb_send(st.session_state.text_area_content, fb_img)
+
+    case '更新情報':
+        with st.expander("**軌道計算機能の細かい修正-更新日:2024/12/11**"):
+            st.markdown('''
+                速度の表記に[km/h]を追加しました。単位はチェックボックスにて随時変更可能です。\n
+                グラフを表示する仕様を変更し、継続的にグラフが変化するようにしました。\n
+                数値を変えるたびに毎度ボタンを押す必要がなくなりました。
+            ''')
+        with st.expander("**フィードバック機能の追加-更新日:2024/12/11**"):
+            st.markdown('''
+                バグ修正や機能向上を目的としたフィードバック機能を追加しました。\n
+                本機能ではテキストの送信と画像ファイルの添付ができるようになっています。\n
+                バグなど問題が見つかった際はご利用ください。
+            ''')
+        with st.expander("**更新情報の掲示-更新日:2024/12/11**"):
+            st.markdown('''
+                バグ修正や新機能を追加した際には、この更新情報機能でお知らせします。\n
+            ''')
 
     case 'coming soon':
         st.sidebar.title("coming soon")
