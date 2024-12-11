@@ -43,7 +43,6 @@ def orbit(r_x, r_y, r_h, angle):
     ax.grid()
 
     st.pyplot(fig)
-    st.write(f"### 結果")
     value1, value2, value3, value4 = st.columns(4)
     with value1:
         st.write(f"- **回転角度**: {math.degrees(yaw):.2f} 度")
