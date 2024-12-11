@@ -105,14 +105,11 @@ match choice:
             max_value=MAX_ANGLE
         )
 
-        button = st.sidebar.button('計算', use_container_width=True)
-
-        if button:
-            try:
-                orbit(input_x, input_y, input_h, input_angle)
-            except ValueError:
-                st.markdown('# 数値を変更してください。')
-                st.markdown('# 物理的に不可能です。')
+        try:
+            orbit(input_x, input_y, input_h, input_angle)
+        except ValueError:
+            st.markdown('# 数値を変更してください。')
+            st.markdown('# 物理的に不可能です。')
 
     case 'coming soon':
         st.sidebar.title("coming soon")
