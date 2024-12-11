@@ -42,22 +42,30 @@ def orbit(r_x, r_y, r_h, angle):
     ax.legend()
     ax.grid()
 
-    graph, num_value = st.columns(2)
-    with graph:
-        st.pyplot(fig)
-    with num_value:
-        st.write(f"### 結果")
+    st.pyplot(fig)
+    st.write(f"### 結果")
+    value1, value2, value3, value4 = st.columns(4)
+    with value1:
         st.write(f"- **回転角度**: {math.degrees(yaw):.2f} 度")
+    with value2:
         st.write(f"- **飛距離**: {z:.2f} m")
-        st.write(f"- **発射速度**: {v:.2f} m/s")
-        st.write(f"- **弾着時の角度**: {impact_angle:.2f} 度")
+    with value3:
+        if not check_box:
+            st.write(f"- **発射速度**: {v:.2f} m/s")
+        elif v >= 331:
+            st.write(f"- **発射速度**: {v * 1000 / 3600:.2f}km/h")
+            st.write(f"- **発射速度**: マッハ{v / 340:.2f}")
+        else:
+            st.write(f"- **発射速度**: {v * 1000 / 3600:.2f} km/h")
+    with value4:
+        st.write(f"- **到達時の角度**: {impact_angle:.2f} 度")
 
 
 # ページ作成
 st.set_page_config(
-    page_title = "計算ソフト",
-    layout = "wide", # wideにすると横長なレイアウトに
-    initial_sidebar_state = "expanded"
+    page_title="計算ソフト",
+    layout="wide",    # wideにすると横長なレイアウトに
+    initial_sidebar_state="expanded"
 )
 
 label = ['軌道計算', 'coming soon']
@@ -105,11 +113,15 @@ match choice:
             max_value=MAX_ANGLE
         )
 
+        check_box = st.sidebar.checkbox('km/h表示')
+
         try:
             orbit(input_x, input_y, input_h, input_angle)
         except ValueError:
             st.markdown('# 数値を変更してください。')
             st.markdown('# 物理的に不可能です。')
+        except ZeroDivisionError:
+            st.markdown('# 射出角度を変更してください。')
 
     case 'coming soon':
         st.sidebar.title("coming soon")
