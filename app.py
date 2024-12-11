@@ -50,7 +50,7 @@ def orbit(r_x, r_y, r_h, angle):
         st.write(f"- **回転角度**: {math.degrees(yaw):.2f} 度")
         st.write(f"- **飛距離**: {z:.2f} m")
         st.write(f"- **発射速度**: {v:.2f} m/s")
-        st.write(f"- **到達時の角度**: {impact_angle:.2f} 度")
+        st.write(f"- **弾着時の角度**: {impact_angle:.2f} 度")
 
 
 # ページ作成
