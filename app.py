@@ -25,7 +25,7 @@ def orbit(r_x, r_y, r_h, angle):
 
     v_x = v * math.cos(theta)  # 水平速度
     v_y = v * math.sin(theta) - g * x / v_x  # 垂直速度（時間 t = x / v_x を利用
-    impact_angle = -math.degrees(math.atan2(v_y, v_x))
+    impact_angle = math.degrees(math.atan2(v_y, v_x))
 
     # 軌道描画用データ生成
     x_vals = np.linspace(0, z, 500)  # 0 から z までの範囲で 500 点を計算
