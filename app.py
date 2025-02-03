@@ -83,7 +83,7 @@ match choice:
 
         col3, col4 = st.sidebar.columns(2)
 
-        with col3:
+        with col1:
             input_g_x = st.number_input(
                 '目標のX座標[m]',
                 step=VALUE_STEP,
@@ -91,7 +91,7 @@ match choice:
                 min_value=MIN_VALUE
             )
 
-        with col4:
+        with col2:
             input_g_y = st.number_input(
                 '目標のY座標[m]',
                 step=VALUE_STEP,
@@ -100,7 +100,7 @@ match choice:
             )
 
 
-        with col1:
+        with col3:
             input_r_x = st.number_input(
                 'ロボットのX座標[m]',
                 step=VALUE_STEP,
@@ -108,7 +108,7 @@ match choice:
                 min_value=MIN_VALUE
             )
 
-        with col2:
+        with col4:
             input_r_y = st.number_input(
                 'ロボットのY座標[m]',
                 step=VALUE_STEP,
