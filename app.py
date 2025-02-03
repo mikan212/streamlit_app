@@ -77,8 +77,17 @@ match choice:
         VALUE_STEP = 1.00
 
         st.sidebar.title("軌道計算")
-        
-        col1, col2 = st.sidebar.columns(2)
+
+        container1 = st.sidebar.container(border=True)
+        with container1:
+            col1, col2 = st.columns(2)
+
+            input_g_h = st.number_input(
+                '目標の高さ[m]',
+                step=VALUE_STEP,
+                value=DEFAULT_VALUE,
+                min_value=MIN_VALUE
+            )
 
         with col1:
             input_g_x = st.number_input(
@@ -96,14 +105,24 @@ match choice:
                 min_value=MIN_VALUE
             )
 
-        input_g_h = st.sidebar.number_input(
-            '目標の高さ[m]',
-            step=VALUE_STEP,
-            value=DEFAULT_VALUE,
-            min_value=MIN_VALUE
-        )
+        container2 = st.sidebar.container(border=True)
+        with container2:
+            col3, col4 = st.columns(2)
 
-        col3, col4 = st.sidebar.columns(2)
+            input_h = st.number_input(
+                '発射機構の高さ[mm]',
+                step=VALUE_STEP,
+                value=DEFAULT_VALUE,
+                min_value=MIN_VALUE
+            )
+
+            input_angle = st.number_input(
+                '発射角度[度]',
+                step=VALUE_STEP,
+                value=DEFAULT_VALUE,
+                min_value=MIN_VALUE,
+                max_value=MAX_ANGLE
+            )
 
         with col3:
             input_r_x = st.number_input(
@@ -120,21 +139,6 @@ match choice:
                 value=DEFAULT_VALUE,
                 min_value=MIN_VALUE
             )
-
-        input_h = st.sidebar.number_input(
-            '発射機構の高さ[mm]',
-            step=VALUE_STEP,
-            value=DEFAULT_VALUE,
-            min_value=MIN_VALUE
-        )
-
-        input_angle = st.sidebar.number_input(
-            '発射角度[度]',
-            step=VALUE_STEP,
-            value=DEFAULT_VALUE,
-            min_value=MIN_VALUE,
-            max_value=MAX_ANGLE
-        )
 
         check_box = st.sidebar.checkbox('km/h表示')
 
