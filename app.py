@@ -18,9 +18,10 @@ def orbit(r_x, r_y, r_h, g_x, g_y, g_h, angle):
     z = math.sqrt(x ** 2 + y ** 2)  # ロボットからタルまでの距離
     yaw = math.acos(x / z)  # 水平方向の回転角
     theta = math.radians(angle)  # 仰角をラジアンに変換
+    h = abs(g_h - r_h) / 1000
 
     # 初速を計算
-    v = math.sqrt((g * z ** 2) / (2 * math.cos(theta) ** 2 * (z * math.tan(theta) - g_h)))
+    v = math.sqrt((g * z ** 2) / (2 * math.cos(theta) ** 2 * (z * math.tan(theta) - h)))
 
     v_x = v * math.cos(theta)  # 水平速度
     v_y = v * math.sin(theta) - g * x / v_x  # 垂直速度（時間 t = x / v_x を利用
