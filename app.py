@@ -2,24 +2,6 @@ import streamlit as st
 import math
 import numpy as np
 import matplotlib.pyplot as plt
-import requests
-
-WEBHOOK_URL = 'https://discord.com/api/webhooks/1316290140167209011/5LiO-XQW7G15UI0F1C6cB16-aS9FkiqygqL2r5HW8uV77v9DBa75uMDpKrrar0dkSYoz'
-
-
-def fb_send(send_contents, img):
-    data = {
-        "content": send_contents
-    }
-    files = {
-        "file": ("image.png", img, "image/png")
-    }
-    response = requests.post(WEBHOOK_URL, data=data, files=files)
-
-    if response.status_code == 204 or response.status_code == 200:
-        st.success("フィードバックを送信しました！ご協力ありがとうございます。")
-    else:
-        st.error("送信に失敗しました。再度お試しください。")
 
 
 # 軌道を計算する関数
@@ -27,9 +9,9 @@ def trajectory(x_vals, v, theta, h_r, g):
     return h_r / 1000 + x_vals * math.tan(theta) - (g * x_vals**2) / (2 * v**2 * math.cos(theta)**2)
 
 
-def orbit(r_x, r_y, r_h, angle):
+def orbit(r_x, r_y, r_h, g_x, g_y, angle):
     g = 9.80665  # 重力加速度
-    g_x, g_y = 0.35, 3.15  # タルの座標
+    # g_x, g_y = 0.35, 3.15  # タルの座標
 
     # 計算
     x, y = r_x - g_x, r_y - g_y
@@ -72,15 +54,10 @@ def orbit(r_x, r_y, r_h, angle):
             st.write(f"- **発射速度**: {v:.2f} m/s")
         elif v >= 331:
             st.write(f"- **発射速度**: {v * 1000 / 3600:.2f}km/h")
-            st.write(f"- **発射速度**: マッハ{v / 340:.2f}")
         else:
             st.write(f"- **発射速度**: {v * 1000 / 3600:.2f} km/h")
     with value4:
         st.write(f"- **到達時の角度**: {impact_angle:.2f} 度")
-
-
-def clear_text_area():
-    st.session_state.text_area_content = ""  # セッションステートをクリア
 
 
 # ページ作成
@@ -90,7 +67,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-label = ['軌道計算', 'フィードバック', '更新情報', 'coming soon']
+label = ['軌道計算']
 choice = st.sidebar.selectbox('メニュー', label)
 
 match choice:
@@ -104,8 +81,27 @@ match choice:
 
         col1, col2 = st.sidebar.columns(2)
 
+        col3, col4 = st.sidebar.columns(2)
+
+        with col3:
+            input_g_x = st.number_input(
+                '目標のX座標[m]',
+                step=VALUE_STEP,
+                value=DEFAULT_VALUE,
+                min_value=MIN_VALUE
+            )
+
+        with col4:
+            input_g_y = st.number_input(
+                '目標のY座標[m]',
+                step=VALUE_STEP,
+                value=DEFAULT_VALUE,
+                min_value=MIN_VALUE
+            )
+
+
         with col1:
-            input_x = st.number_input(
+            input_r_x = st.number_input(
                 'ロボットのX座標[m]',
                 step=VALUE_STEP,
                 value=DEFAULT_VALUE,
@@ -113,7 +109,7 @@ match choice:
             )
 
         with col2:
-            input_y = st.number_input(
+            input_r_y = st.number_input(
                 'ロボットのY座標[m]',
                 step=VALUE_STEP,
                 value=DEFAULT_VALUE,
@@ -138,54 +134,9 @@ match choice:
         check_box = st.sidebar.checkbox('km/h表示')
 
         try:
-            orbit(input_x, input_y, input_h, input_angle)
+            orbit(input_r_x, input_r_y, input_h, input_g_x, input_g_y, input_angle)
         except ValueError:
             st.markdown('# 数値を変更してください。')
             st.markdown('# 物理的に不可能です。')
         except ZeroDivisionError:
             st.markdown('# 射出角度を変更してください。')
-
-    case 'フィードバック':
-        if "text_area_content" not in st.session_state:
-            st.session_state.text_area_content = ""
-        st.markdown('## フィードバックを送信する')
-        st.markdown('##### ※個人情報など個人を特定できる情報を含めないでください。')
-        st.text_area(
-            label="ここにテキストを入力してください",
-            value=st.session_state.text_area_content,  # セッションステートの値を使用
-            key="text_area_content",
-            height=350
-        )
-        fb_img = st.file_uploader(
-            label="スクリーンショットを追加していただくと、フィードバックを把握するうえで役立ちます。",
-            type=['jpg', 'jpeg', 'png'],
-        )
-        col1, col2 = st.columns(2)
-        with col1:
-            clear_btn = st.button('クリア', on_click=clear_text_area, use_container_width=True)
-        with col2:
-            feedback_btn = st.button('送信', type='primary', icon=":material/send:", use_container_width=True)
-
-        if feedback_btn:
-            fb_send(st.session_state.text_area_content, fb_img)
-
-    case '更新情報':
-        with st.expander("**軌道計算機能の細かい修正-更新日:2024/12/11**"):
-            st.markdown('''
-                速度の表記に[km/h]を追加しました。単位はチェックボックスにて随時変更可能です。\n
-                グラフを表示する仕様を変更し、継続的にグラフが変化するようにしました。\n
-                数値を変えるたびに毎度ボタンを押す必要がなくなりました。
-            ''')
-        with st.expander("**フィードバック機能の追加-更新日:2024/12/11**"):
-            st.markdown('''
-                バグ修正や機能向上を目的としたフィードバック機能を追加しました。\n
-                本機能ではテキストの送信と画像ファイルの添付ができるようになっています。\n
-                バグなど問題が見つかった際はご利用ください。
-            ''')
-        with st.expander("**更新情報の掲示-更新日:2024/12/11**"):
-            st.markdown('''
-                バグ修正や新機能を追加した際には、この更新情報機能でお知らせします。\n
-            ''')
-
-    case 'coming soon':
-        st.sidebar.title("coming soon")
