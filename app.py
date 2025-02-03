@@ -9,7 +9,7 @@ def trajectory(x_vals, v, theta, h_r, g):
     return h_r / 1000 + x_vals * math.tan(theta) - (g * x_vals**2) / (2 * v**2 * math.cos(theta)**2)
 
 
-def orbit(r_x, r_y, r_h, g_x, g_y, angle):
+def orbit(r_x, r_y, r_h, g_x, g_y, g_h, angle):
     g = 9.80665  # 重力加速度
     # g_x, g_y = 0.35, 3.15  # タルの座標
 
@@ -18,10 +18,9 @@ def orbit(r_x, r_y, r_h, g_x, g_y, angle):
     z = math.sqrt(x ** 2 + y ** 2)  # ロボットからタルまでの距離
     yaw = math.acos(x / z)  # 水平方向の回転角
     theta = math.radians(angle)  # 仰角をラジアンに変換
-    h = (345 - r_h) / 1000  # タルの高さ [m]
 
     # 初速を計算
-    v = math.sqrt((g * z ** 2) / (2 * math.cos(theta) ** 2 * (z * math.tan(theta) - h)))
+    v = math.sqrt((g * z ** 2) / (2 * math.cos(theta) ** 2 * (z * math.tan(theta) - g_h)))
 
     v_x = v * math.cos(theta)  # 水平速度
     v_y = v * math.sin(theta) - g * x / v_x  # 垂直速度（時間 t = x / v_x を利用
@@ -34,7 +33,7 @@ def orbit(r_x, r_y, r_h, g_x, g_y, angle):
     # 軌跡の描画
     fig, ax = plt.subplots(figsize=(10, 6))
     ax.plot(x_vals, y_vals, label="Projectile Trajectory", color="blue")
-    ax.scatter([z], [0.345], color="red", label="Target", zorder=5)  # タルの座標を描画
+    ax.scatter([z], [g_h], color="red", label="Target", zorder=5)  # タルの座標を描画
     ax.axhline(0, color="black", linewidth=0.5, linestyle="--")  # 地面
     ax.set_title("Trajectory")
     ax.set_xlabel("Altitude (m)")
@@ -78,10 +77,8 @@ match choice:
         VALUE_STEP = 1.00
 
         st.sidebar.title("軌道計算")
-
+        
         col1, col2 = st.sidebar.columns(2)
-
-        col3, col4 = st.sidebar.columns(2)
 
         with col1:
             input_g_x = st.number_input(
@@ -99,6 +96,14 @@ match choice:
                 min_value=MIN_VALUE
             )
 
+        input_g_h = st.sidebar.number_input(
+            '目標の高さ[m]',
+            step=VALUE_STEP,
+            value=DEFAULT_VALUE,
+            min_value=MIN_VALUE
+        )
+
+        col3, col4 = st.sidebar.columns(2)
 
         with col3:
             input_r_x = st.number_input(
@@ -134,7 +139,7 @@ match choice:
         check_box = st.sidebar.checkbox('km/h表示')
 
         try:
-            orbit(input_r_x, input_r_y, input_h, input_g_x, input_g_y, input_angle)
+            orbit(input_r_x, input_r_y, input_h, input_g_x, input_g_y, input_g_h, input_angle)
         except ValueError:
             st.markdown('# 数値を変更してください。')
             st.markdown('# 物理的に不可能です。')
