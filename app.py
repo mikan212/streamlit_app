@@ -34,7 +34,7 @@ def orbit(r_x, r_y, r_h, g_x, g_y, g_h, angle):
     # 軌跡の描画
     fig, ax = plt.subplots(figsize=(10, 6))
     ax.plot(x_vals, y_vals, label="Projectile Trajectory", color="blue")
-    ax.scatter([z], [g_h], color="red", label="Target", zorder=5)  # タルの座標を描画
+    ax.scatter([z], [g_h/1000], color="red", label="Target", zorder=5)  # タルの座標を描画
     ax.axhline(0, color="black", linewidth=0.5, linestyle="--")  # 地面
     ax.set_title("Trajectory")
     ax.set_xlabel("Altitude (m)")
@@ -84,7 +84,7 @@ match choice:
             col1, col2 = st.columns(2)
 
             input_g_h = st.number_input(
-                '目標の高さ[m]',
+                '目標の高さ[mm]',
                 step=VALUE_STEP,
                 value=DEFAULT_VALUE,
                 min_value=MIN_VALUE
