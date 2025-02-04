@@ -76,7 +76,7 @@ match choice:
         MIN_VALUE = 0.00
         MAX_ANGLE = 89.00
         DEFAULT_VALUE = 0.00
-        VALUE_STEP = 1.00
+        VALUE_STEP = 10.00
 
         st.sidebar.title("軌道計算")
 
